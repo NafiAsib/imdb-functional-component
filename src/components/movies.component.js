@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import Table from './table.component';
+import _ from 'lodash';
+
 import getMovies from '../service/get-movies.service';
 import getGenres from '../service/get-genres.service';
+
+import Filter from './common/filter.component';
+import Table from './table.component';
 import Rating from './rating.component';
 import Pagination from './common/pagination.component';
-import _ from 'lodash';
-import Filter from './common/filter.component';
 
 const Movies = () => {
     const [movies, setMovies] = useState([]);
