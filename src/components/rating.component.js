@@ -1,41 +1,33 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
-class Rating extends Component {
-    state = {
-        isMouseOver: false,
+const Rating = ({ isFavourite, handleToggleFavourite, id }) => {
+    const [isMouseOver, setIsMouseOver] = useState(false);
+
+    const handleMouseOver = () => {
+        setIsMouseOver(true);
     };
 
-    handleMouseOver = () => {
-        this.setState({ isMouseOver: true });
+    const handleMouseOut = () => {
+        setIsMouseOver(false);
     };
 
-    handleMouseOut = () => {
-        this.setState({ isMouseOver: false });
-    };
-
-    getClassName = () => {
-        const { isFavourite } = this.props;
-        const { isMouseOver } = this.state;
+    const getClassName = () => {
         let className = isFavourite ? 'bi bi-star-fill' : 'bi bi-star';
         className += isMouseOver ? ' text-primary' : '';
         return className;
     };
 
-    render() {
-        const { handleToggleFavourite, id } = this.props;
-
-        return (
-            <td>
-                <i
-                    onMouseOver={this.handleMouseOver}
-                    onMouseOut={this.handleMouseOut}
-                    onClick={() => handleToggleFavourite(id)}
-                    className={this.getClassName()}
-                    style={{ cursor: 'pointer' }}
-                />
-            </td>
-        );
-    }
-}
+    return (
+        <td>
+            <i
+                onMouseOver={handleMouseOver}
+                onMouseOut={handleMouseOut}
+                onClick={() => handleToggleFavourite(id)}
+                className={getClassName()}
+                style={{ cursor: 'pointer' }}
+            />
+        </td>
+    );
+};
 
 export default Rating;

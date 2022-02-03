@@ -45,7 +45,7 @@ const Movies = () => {
         const allMovies = movies;
         const movie = allMovies.find((movie) => movie.id === id);
         movie.isFavourite = !movie.isFavourite;
-        setMovies(allMovies);
+        setMovies([...allMovies]);
     };
 
     const onClickPage = (activePage) => {
