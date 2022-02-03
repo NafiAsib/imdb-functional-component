@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from './table.component';
 import getMovies from '../service/get-movies.service';
 import getGenres from '../service/get-genres.service';
@@ -7,52 +7,54 @@ import Pagination from './common/pagination.component';
 import _ from 'lodash';
 import Filter from './common/filter.component';
 
-class Movies extends Component {
-    state = {
-        movies: [],
-        genres: [],
-        sortingProps: { key: 'id', order: 'asc' },
-        activePage: 1,
-        itemsPerPage: 10,
-        selectedGenre: 'All',
-    };
+const Movies = () => {
+    const [movies, setMovies] = useState([]);
+    const [genres, setGenres] = useState([]);
+    const [sortingProps, setSortingProps] = useState({
+        key: 'id',
+        order: 'asc',
+    });
+    const [activePage, setActivePage] = useState(1);
+    const [itemsPerPage] = useState(10);
+    const [selectedGenre, setSelectedGenre] = useState('All');
 
-    componentDidMount() {
+    useEffect(() => {
         const movies = getMovies();
         const genres = ['All', ...getGenres()];
-        this.setState({ ...this.state, movies, genres });
-    }
+        setMovies(movies);
+        setGenres(genres);
+    }, []);
 
-    onFilter = (genre) => {
-        this.setState({ ...this.state, selectedGenre: genre, activePage: 1 });
+    const onFilter = (genre) => {
+        setSelectedGenre(genre);
+        setActivePage(1);
     };
 
-    filterMovies = () => {
-        const movies = [...this.state.movies];
-        const filteredMovies = movies.filter((movie) => {
-            if (this.state.selectedGenre === 'All') return true;
-            return movie.genres.includes(this.state.selectedGenre);
+    const filterMovies = () => {
+        const allMovies = movies;
+        const filteredMovies = allMovies.filter((movie) => {
+            if (selectedGenre === 'All') return true;
+            return movie.genres.includes(selectedGenre);
         });
         return filteredMovies;
     };
 
-    handleToggleFavourite = (id) => {
-        const movies = [...this.state.movies];
-        const movie = movies.find((movie) => movie.id === id);
+    const handleToggleFavourite = (id) => {
+        const allMovies = movies;
+        const movie = allMovies.find((movie) => movie.id === id);
         movie.isFavourite = !movie.isFavourite;
-        this.setState({ ...this.state, movies });
+        setMovies(allMovies);
     };
 
-    onClickPage = (activePage) => {
-        this.setState({ ...this.state, activePage });
+    const onClickPage = (activePage) => {
+        setActivePage(activePage);
     };
 
-    handleSort = (sortingProps) => {
-        this.setState({ ...this.state, sortingProps });
+    const handleSort = (sortingProps) => {
+        setSortingProps(sortingProps);
     };
 
-    sortMovies = (filteredMovies) => {
-        const { sortingProps } = this.state;
+    const sortMovies = (filteredMovies) => {
         const movies = [...filteredMovies];
 
         const sortedMovies = _.orderBy(
@@ -63,90 +65,88 @@ class Movies extends Component {
         return sortedMovies;
     };
 
-    paginateMovies = (movies) => {
-        const { activePage, itemsPerPage } = this.state;
+    const paginateMovies = (movies) => {
         const start = (activePage - 1) * itemsPerPage;
         const paginatedMovies = movies.slice(start, start + itemsPerPage);
         return paginatedMovies;
     };
 
-    render() {
-        const filteredMovies = this.filterMovies();
-        const sortedMovies = this.sortMovies(filteredMovies);
-        const moviesToRender = this.paginateMovies(sortedMovies);
-        const movieColumns = [
-            {
-                label: 'Rank',
-                key: 'id',
-                isSortable: true,
-                content: (movie, key) => <th scope="row">{movie[key]}</th>,
-            },
-            {
-                label: 'Title',
-                key: 'title',
-                isSortable: true,
-                content: (movie, key) => <td>{movie[key]}</td>,
-            },
-            {
-                label: 'Poster',
-                key: 'posterUrl',
-                content: (movie, key) => (
-                    <td>
-                        <img
-                            src={movie[key]}
-                            alt="poster"
-                            height={100}
-                            width={'auto'}
-                        />
-                    </td>
-                ),
-            },
-            {
-                label: 'Favourite',
-                key: 'isFavourite',
-                content: (movie, key) => (
-                    <Rating
-                        isFavourite={movie[key]}
-                        id={movie.id}
-                        handleToggleFavourite={this.handleToggleFavourite}
-                    />
-                ),
-            },
-            {
-                label: 'Action',
-                key: 'action',
-                content: (movie, key) => <td>{movie[key]}</td>,
-            },
-        ];
+    const filteredMovies = filterMovies();
+    const sortedMovies = sortMovies(filteredMovies);
+    const moviesToRender = paginateMovies(sortedMovies);
 
-        return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-sm-3">
-                        <Filter
-                            items={this.state.genres}
-                            selectedGenre={this.state.selectedGenre}
-                            onFilter={this.onFilter}
-                        />
-                    </div>
-                    <div className="col-8">
-                        <Table
-                            items={moviesToRender}
-                            columns={movieColumns}
-                            sortingProps={this.state.sortingProps}
-                            onSort={this.handleSort}
-                        />
-                        <Pagination
-                            totalItems={filteredMovies.length}
-                            itemsPerPage={this.state.itemsPerPage}
-                            activePage={this.state.activePage}
-                            onClickPage={this.onClickPage}
-                        />
-                    </div>
+    const movieColumns = [
+        {
+            label: 'Rank',
+            key: 'id',
+            isSortable: true,
+            content: (movie, key) => <th scope="row">{movie[key]}</th>,
+        },
+        {
+            label: 'Title',
+            key: 'title',
+            isSortable: true,
+            content: (movie, key) => <td>{movie[key]}</td>,
+        },
+        {
+            label: 'Poster',
+            key: 'posterUrl',
+            content: (movie, key) => (
+                <td>
+                    <img
+                        src={movie[key]}
+                        alt="poster"
+                        height={100}
+                        width={'auto'}
+                    />
+                </td>
+            ),
+        },
+        {
+            label: 'Favourite',
+            key: 'isFavourite',
+            content: (movie, key) => (
+                <Rating
+                    isFavourite={movie[key]}
+                    id={movie.id}
+                    handleToggleFavourite={handleToggleFavourite}
+                />
+            ),
+        },
+        {
+            label: 'Action',
+            key: 'action',
+            content: (movie, key) => <td>{movie[key]}</td>,
+        },
+    ];
+
+    return (
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-sm-3">
+                    <Filter
+                        items={genres}
+                        selectedGenre={selectedGenre}
+                        onFilter={onFilter}
+                    />
+                </div>
+                <div className="col-8">
+                    <Table
+                        items={moviesToRender}
+                        columns={movieColumns}
+                        sortingProps={sortingProps}
+                        onSort={handleSort}
+                    />
+                    <Pagination
+                        totalItems={filteredMovies.length}
+                        itemsPerPage={itemsPerPage}
+                        activePage={activePage}
+                        onClickPage={onClickPage}
+                    />
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 export default Movies;
