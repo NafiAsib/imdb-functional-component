@@ -1,5 +1,5 @@
-# IMDb w/ class component
-Simple responsive react app created using react class components. 
+# IMDb w/ functional component
+Implementation of [this project](https://github.com/NafiAsib/imdb-class-component) with functional component replacing class components.
 #### Features:
 * Pagination
 * Sorting
