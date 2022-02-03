@@ -1,10 +1,8 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class TableHeader extends Component {
-    handleSort = ({ key, isSortable }) => {
+const TableHeader = ({ columns, sortingProps, onSort }) => {
+    const handleSort = ({ key, isSortable }) => {
         if (!isSortable) return null;
-
-        const { onSort, sortingProps } = this.props;
 
         if (sortingProps.key === key) {
             if (sortingProps.order === 'asc') {
@@ -17,7 +15,7 @@ class TableHeader extends Component {
         }
     };
 
-    getSortingIcon = (item, sortingProps) => {
+    const getSortingIcon = (item, sortingProps) => {
         if (sortingProps.key === item.key) {
             if (sortingProps.order === 'asc') {
                 return (
@@ -37,33 +35,26 @@ class TableHeader extends Component {
         } else return null;
     };
 
-    render() {
-        const { columns, sortingProps } = this.props;
-        // console.log(columns);
-        return (
-            <>
-                <thead>
-                    <tr>
-                        {columns.map((item) => (
-                            <th
-                                scope="col"
-                                key={item.label}
-                                onClick={() => this.handleSort(item)}
-                                style={
-                                    item.isSortable
-                                        ? { cursor: 'pointer' }
-                                        : null
-                                }
-                            >
-                                {item.label}{' '}
-                                {this.getSortingIcon(item, sortingProps)}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-            </>
-        );
-    }
-}
+    return (
+        <>
+            <thead>
+                <tr>
+                    {columns.map((item) => (
+                        <th
+                            scope="col"
+                            key={item.label}
+                            onClick={() => handleSort(item)}
+                            style={
+                                item.isSortable ? { cursor: 'pointer' } : null
+                            }
+                        >
+                            {item.label} {getSortingIcon(item, sortingProps)}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+        </>
+    );
+};
 
 export default TableHeader;
